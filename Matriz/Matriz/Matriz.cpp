@@ -1,14 +1,17 @@
-// Matriz.cpp : Este archivo contiene la función "main". La ejecución del programa comienza y termina ahí.
-//
-
 #include <iostream>
 #include <Windows.h>
 #include <direct.h>
 #include <stdlib.h>
-#define ANCHO 100
-#define ALTO 100
+#include <random>
+#include <windows.graphics.h>
+#include <chrono>
+#include <thread>
+
+
+#define ANCHO 40
+#define ALTO 20
 using namespace std;
-int matrizweb[5][5];
+int matrizweb[6][6];
 
 void gotoxy(int x, int y)
 {
@@ -20,42 +23,181 @@ void gotoxy(int x, int y)
     SetConsoleCursorPosition(hCon, dwPos);
 }
 
-void matriz()
+
+void dibujarEje() {
+
+    for (int i = 0; i <= ANCHO; i++) {
+        gotoxy(i, (ALTO / 5)+4);
+        cout << char(95);
+        gotoxy(i, ((ALTO / 5)*2)+4);
+        cout << char(95);
+        gotoxy(i, ((ALTO / 5) * 3)+4);
+        cout << char(95);
+        gotoxy(i, ((ALTO / 5) * 4)+4);
+        cout << char(95);
+        gotoxy(i, ((ALTO / 5) * 5)+4);
+        cout << char(95);
+
+    }
+    for (int i = 1; i < ALTO; i++) {
+        gotoxy((ANCHO/5), i+4);
+        cout << char(179);
+        gotoxy((ANCHO / 5)*2, i+4);
+        cout << char(179);
+        gotoxy(((ANCHO / 5)*3), i+4);
+        cout << char(179);
+        gotoxy((ANCHO / 5) * 4, i+4);
+        cout << char(179);
+        gotoxy(((ANCHO / 5) * 5), i+4);
+        cout << char(179);
+        
+
+    }
+
+}
+void posicionU(int posiciony, int posicionx)
 {
-    for (int x = 0; x < 5; x++)
+        gotoxy(posicionx, (posiciony));
+        cout << "Y";
+}
+
+void iociones(int &cont,int &index, int &indexy)
+{
+    for (int i = 0; i < 6; i++)
     {
-        for (int y = 0; y < 5; y++)
+        for (int j = 0; j < 6; j++)
         {
-            gotoxy(x, y);
-            cout<<matrizweb[x][y];
+            matrizweb[i][j] = 0;
         }
+    }
+    if (cont == 2)
+    {
+        //aqui ponemos todos los numeros aleatorios
+       //ojo si y solo si las casillas no llegan a tocar las orillas
+        
+                if(index - 1 != 0 )
+                matrizweb[index - 1][indexy] = 1 + rand() % 10;
+                if (index + 1 != 0)
+                matrizweb[index + 1][indexy] = 1 + rand() % 10;
+                if (index - 1 != 0 && indexy + 1 != 5)
+                matrizweb[index - 1][indexy + 1] = 1 + rand() % 10;
+                if (index - 1 != 0 && indexy - 1 != 0)
+                matrizweb[index - 1][indexy - 1] = 1 + rand() % 10;
+                if (index + 1 != 5 && indexy + 1 != 5)
+                matrizweb[index + 1][indexy + 1] = 1 + rand() % 10;
+                if (index + 1 != 5 && indexy - 1 != 0)
+                matrizweb[index + 1][indexy - 1] = 1 + rand() % 10;
+                if (indexy + 1 != 0)
+                matrizweb[index][indexy + 1] = 1 + rand() % 10;
+                if (indexy - 1 != 0)
+                matrizweb[index][indexy - 1] = 1 + rand() % 10;
+            
+        //aqui llamamos al procedimiento para llenar la matriz graficada
     }
 }
 
-void cuadrosweb()
-{
-    for (int x = ANCHO / 5; x >= 0; x--);
-}
 
 int main()
 {
+    system("cls");
     system("Color 30");
-    char key;
-    matriz();
-    cin >> key;
-    if (key == 37)
-    {
-        cout << "Izquierda";
+    bool rest = true, subOp = true;
+    int opcion;
+    char direccion;
+   srand(time(NULL));
+   while (rest)
+   {
+       system("cls");
+       cout << "Bienvenido \nEmpezar juego 1\nSalir 0\n";
+       cin >> opcion;
+       if (opcion == 0)
+       {
+           rest = false;
+       }
+       else
+       {
+           subOp = true;
+           int posicionyicial = 1 + rand() % 5;
+           int yd = (posicionyicial * 5)+2;
+           int xd = 1;
+           int index = posicionyicial;
+           int indexy = 1;
+           int cont = 2;
+           while (subOp)
+           { 
+               system("cls");
+
+               cout << "D para moverse a la derecha.\nI para moverse a la izquierda.\nU para moverse arriba.\nA para moverse abajo.\n";
+
+               this_thread::sleep_for(std::chrono::seconds(1));
+
+               dibujarEje();
+               posicionU(yd, xd);
+               this_thread::sleep_for(std::chrono::seconds(1));
+               CONSOLE_SCREEN_BUFFER_INFO screenInfo;
+               GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &screenInfo);
+               gotoxy(screenInfo.dwCursorPosition.X, screenInfo.dwCursorPosition.Y);
+               
+               if (cont != 2)
+               {
+                   gotoxy(45, 2);
+                   cout << "Moverse: ";
+                   cin >> direccion;
+                   if (direccion == 'D')
+                   {
+                       xd += 10;
+                       index++;
+                       cont++;
+                   }
+                   else if (direccion == 'I')
+                   {
+                       xd -= 10;
+                       index--;
+                       cont++;
+                   }
+                   else if (direccion == 'U')
+                   {
+                       yd -= 4;
+                       indexy++;
+                       cont++;
+                   }
+                   else if (direccion == 'A')
+                   {
+                       yd += 4;
+                       indexy--;
+                       cont++;
+                   }
+                   else
+                   {
+                       subOp = false;
+                   }
+               }
+               else
+               {
+                   gotoxy(45, 2);
+                   cout << "Ingrese el resultado: ";
+                   cin >> direccion;
+                   cont = 0;
+               }
+           }
+       }
     }
+    int posicionyicial = 1 + rand() % (101 - 1);
+   
+   
+    
+
+    
+    
+
+
+
+
+
+    
+    return 0;
+
+    
 
 }
 
-// Ejecutar programa: Ctrl + F5 o menú Depurar > Iniciar sin depurar
-// Depurar programa: F5 o menú Depurar > Iniciar depuración
-
-// Sugerencias para primeros pasos: 1. Use la ventana del Explorador de soluciones para agregar y administrar archivos
-//   2. Use la ventana de Team Explorer para conectar con el control de código fuente
-//   3. Use la ventana de salida para ver la salida de compilación y otros mensajes
-//   4. Use la ventana Lista de errores para ver los errores
-//   5. Vaya a Proyecto > Agregar nuevo elemento para crear nuevos archivos de código, o a Proyecto > Agregar elemento existente para agregar archivos de código existentes al proyecto
-//   6. En el futuro, para volver a abrir este proyecto, vaya a Archivo > Abrir > Proyecto y seleccione el archivo .sln
