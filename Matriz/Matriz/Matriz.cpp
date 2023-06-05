@@ -28,7 +28,9 @@ void gotoxy(int x, int y)
 
 void dibujarEje() {
 
-    for (int i = 0; i <= ANCHO+10; i++) {
+    for (int i = 0; i <= ANCHO+8; i++) {
+        gotoxy(i, (ALTO / 5));
+        cout << char(95);
         gotoxy(i, (ALTO / 5)+4);
         cout << char(95);
         gotoxy(i, ((ALTO / 5)*2)+4);
@@ -41,7 +43,7 @@ void dibujarEje() {
         cout << char(95);
 
     }
-    for (int i = 1; i < ALTO; i++) {
+    for (int i = 1; i < ALTO-4; i++) {
         gotoxy((ANCHO/4), i+4);
         cout << char(179);
         gotoxy((ANCHO / 4)*2, i+4);
@@ -165,6 +167,7 @@ int main()
                matrizweb[posicionMwetax][posicionMwta] = 11;
                if (intentos == 0)
                {
+                   system("cls");
                    cout << "Sin intentos. Juego terminado";
                    this_thread::sleep_for(std::chrono::seconds(3));
                    
@@ -172,6 +175,7 @@ int main()
                }
                if (index == posicionMwetax && indexy == posicionMwta)
                {
+                   system("cls");
                    cout << "Ganaste!!!. Juego terminado";
                    this_thread::sleep_for(std::chrono::seconds(3));
 
@@ -240,6 +244,7 @@ int main()
                        gotoxy(45, 5);
                        cout << "Correcto";
                        this_thread::sleep_for(std::chrono::seconds(2));
+                       cont = 0;
                    }
                    else {
                        gotoxy(45, 5);
@@ -249,9 +254,10 @@ int main()
                        yd = yd2;
                        xd = xd2;
                        this_thread::sleep_for(std::chrono::seconds(2));
+                       cont = 2;
                        intentos--;
                    }
-                   cont = 0;
+                
                }
            }
        }
