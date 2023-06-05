@@ -1,5 +1,6 @@
 #include <iostream>
 #include <Windows.h>
+#include <string>
 #include <direct.h>
 #include <stdlib.h>
 #include <random>
@@ -8,10 +9,11 @@
 #include <thread>
 
 
-#define ANCHO 40
-#define ALTO 20
+#define ANCHO 38
+#define ALTO 24
 using namespace std;
-int matrizweb[6][6];
+int matrizweb[7][7];
+int posicionyicial;
 
 void gotoxy(int x, int y)
 {
@@ -26,7 +28,7 @@ void gotoxy(int x, int y)
 
 void dibujarEje() {
 
-    for (int i = 0; i <= ANCHO; i++) {
+    for (int i = 0; i <= ANCHO+10; i++) {
         gotoxy(i, (ALTO / 5)+4);
         cout << char(95);
         gotoxy(i, ((ALTO / 5)*2)+4);
@@ -40,15 +42,15 @@ void dibujarEje() {
 
     }
     for (int i = 1; i < ALTO; i++) {
-        gotoxy((ANCHO/5), i+4);
+        gotoxy((ANCHO/4), i+4);
         cout << char(179);
-        gotoxy((ANCHO / 5)*2, i+4);
+        gotoxy((ANCHO / 4)*2, i+4);
         cout << char(179);
-        gotoxy(((ANCHO / 5)*3), i+4);
+        gotoxy(((ANCHO / 4)*3), i+4);
         cout << char(179);
-        gotoxy((ANCHO / 5) * 4, i+4);
+        gotoxy((ANCHO / 4) * 4, i+4);
         cout << char(179);
-        gotoxy(((ANCHO / 5) * 5), i+4);
+        gotoxy(((ANCHO / 4) * 5), i+4);
         cout << char(179);
         
 
@@ -61,11 +63,33 @@ void posicionU(int posiciony, int posicionx)
         cout << "Y";
 }
 
+void colocar_datos()
+{
+    for (int i = 1; i < 6; i++)
+    {
+        for (int j = 1; j < 6; j++)
+        {
+            //if (matrizweb[i][j] != 0)
+            {
+                gotoxy((i * 7), (j * 4.5)+1);
+                cout << "\t" + to_string(matrizweb[i][j]);
+                
+            }
+        }
+    }
+}
+
+int solucionar_matriz(int &index, int &indexy)
+{
+    int solucion = ((matrizweb[index][indexy - 1] + matrizweb[index - 1][indexy - 1] + matrizweb[index + 1][indexy - 1]) * matrizweb[index + 1][indexy]) - ((matrizweb[index][indexy + 1] + matrizweb[index + 1][indexy + 1] + matrizweb[index - 1][indexy + 1]) * matrizweb[index - 1][indexy]);
+    return solucion;
+}
+
 void iociones(int &cont,int &index, int &indexy)
 {
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < 7; i++)
     {
-        for (int j = 0; j < 6; j++)
+        for (int j = 0; j < 7; j++)
         {
             matrizweb[i][j] = 0;
         }
@@ -77,24 +101,27 @@ void iociones(int &cont,int &index, int &indexy)
         
                 if(index - 1 != 0 )
                 matrizweb[index - 1][indexy] = 1 + rand() % 10;
-                if (index + 1 != 0)
+                if (index + 1 != 6)
                 matrizweb[index + 1][indexy] = 1 + rand() % 10;
-                if (index - 1 != 0 && indexy + 1 != 5)
+                if (index - 1 != 0 && indexy + 1 != 6)
                 matrizweb[index - 1][indexy + 1] = 1 + rand() % 10;
                 if (index - 1 != 0 && indexy - 1 != 0)
                 matrizweb[index - 1][indexy - 1] = 1 + rand() % 10;
-                if (index + 1 != 5 && indexy + 1 != 5)
+                if (index + 1 != 6 && indexy + 1 != 6)
                 matrizweb[index + 1][indexy + 1] = 1 + rand() % 10;
-                if (index + 1 != 5 && indexy - 1 != 0)
+                if (index + 1 != 6 && indexy - 1 != 0)
                 matrizweb[index + 1][indexy - 1] = 1 + rand() % 10;
-                if (indexy + 1 != 0)
+                if (indexy + 1 != 6)
                 matrizweb[index][indexy + 1] = 1 + rand() % 10;
                 if (indexy - 1 != 0)
                 matrizweb[index][indexy - 1] = 1 + rand() % 10;
             
         //aqui llamamos al procedimiento para llenar la matriz graficada
+                colocar_datos();
     }
 }
+
+
 
 
 int main()
@@ -103,7 +130,7 @@ int main()
     system("Color 30");
     bool rest = true, subOp = true;
     int opcion;
-    char direccion;
+    string direccion;
    srand(time(NULL));
    while (rest)
    {
@@ -118,10 +145,10 @@ int main()
        {
            subOp = true;
            int posicionyicial = 1 + rand() % 5;
-           int yd = (posicionyicial * 5)+2;
+           int yd = (posicionyicial * 4)+2;
            int xd = 1;
-           int index = posicionyicial;
-           int indexy = 1;
+           int index = 1;
+           int indexy = posicionyicial;
            int cont = 2;
            while (subOp)
            { 
@@ -132,6 +159,8 @@ int main()
                this_thread::sleep_for(std::chrono::seconds(1));
 
                dibujarEje();
+               if (cont == 2)
+                   iociones(cont, (index), indexy);
                posicionU(yd, xd);
                this_thread::sleep_for(std::chrono::seconds(1));
                CONSOLE_SCREEN_BUFFER_INFO screenInfo;
@@ -143,46 +172,59 @@ int main()
                    gotoxy(45, 2);
                    cout << "Moverse: ";
                    cin >> direccion;
-                   if (direccion == 'D')
+                   if (direccion == "D")
                    {
-                       xd += 10;
+                       xd += 12;
                        index++;
                        cont++;
                    }
-                   else if (direccion == 'I')
+                   else if (direccion == "I")
                    {
-                       xd -= 10;
+                       xd -= 12;
                        index--;
                        cont++;
                    }
-                   else if (direccion == 'U')
+                   else if (direccion == "U")
                    {
                        yd -= 4;
-                       indexy++;
+                       indexy--;
                        cont++;
                    }
-                   else if (direccion == 'A')
+                   else if (direccion == "A")
                    {
                        yd += 4;
-                       indexy--;
+                       indexy++;
                        cont++;
                    }
                    else
                    {
                        subOp = false;
                    }
+                   
+                  
                }
                else
                {
                    gotoxy(45, 2);
                    cout << "Ingrese el resultado: ";
                    cin >> direccion;
+                   if (solucionar_matriz(index, indexy) == stoi(direccion))
+                   {
+                       gotoxy(45, 5);
+                       cout << "Correcto";
+                       this_thread::sleep_for(std::chrono::seconds(2));
+                   }
+                   else {
+                       gotoxy(45, 5);
+                       cout << "Incorrecto";
+                       this_thread::sleep_for(std::chrono::seconds(2));
+                   }
                    cont = 0;
                }
            }
        }
     }
-    int posicionyicial = 1 + rand() % (101 - 1);
+   
    
    
     
