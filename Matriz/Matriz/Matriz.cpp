@@ -57,10 +57,13 @@ void dibujarEje() {
     }
 
 }
-void posicionU(int posiciony, int posicionx)
+void posicionU(int posiciony, int posicionx, int metax, int metay)
 {
         gotoxy(posicionx, (posiciony));
-        cout << "Y";
+        cout << ":)";
+
+        gotoxy(metax*7.5, (metay*4)+2);
+        cout << "Meta";
 }
 
 void colocar_datos()
@@ -69,7 +72,7 @@ void colocar_datos()
     {
         for (int j = 1; j < 6; j++)
         {
-            //if (matrizweb[i][j] != 0)
+            if (matrizweb[i][j] != 0)
             {
                 gotoxy((i * 7), (j * 4.5)+1);
                 cout << "\t" + to_string(matrizweb[i][j]);
@@ -150,18 +153,42 @@ int main()
            int index = 1;
            int indexy = posicionyicial;
            int cont = 2;
+           int intentos = 8;
+           int inicialx = 1;
+           int inicialy = indexy;
+           int posicionMwta = 1 + rand() % 5;
+           int posicionMwetax = 5;
+           int xd2 = xd;
+           int yd2 = yd;
            while (subOp)
            { 
+               matrizweb[posicionMwetax][posicionMwta] = 11;
+               if (intentos == 0)
+               {
+                   cout << "Sin intentos. Juego terminado";
+                   this_thread::sleep_for(std::chrono::seconds(3));
+                   
+                   break;
+               }
+               if (index == posicionMwetax && indexy == posicionMwta)
+               {
+                   cout << "Ganaste!!!. Juego terminado";
+                   this_thread::sleep_for(std::chrono::seconds(3));
+
+                   break;
+               }
                system("cls");
 
                cout << "D para moverse a la derecha.\nI para moverse a la izquierda.\nU para moverse arriba.\nA para moverse abajo.\n";
-
+               gotoxy(45, 1);
+               cout << "Intentos: " + to_string(intentos);
                this_thread::sleep_for(std::chrono::seconds(1));
 
                dibujarEje();
+               posicionU(yd, xd, posicionMwetax, posicionMwta);
                if (cont == 2)
                    iociones(cont, (index), indexy);
-               posicionU(yd, xd);
+               
                this_thread::sleep_for(std::chrono::seconds(1));
                CONSOLE_SCREEN_BUFFER_INFO screenInfo;
                GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &screenInfo);
@@ -217,7 +244,12 @@ int main()
                    else {
                        gotoxy(45, 5);
                        cout << "Incorrecto";
+                       index = inicialx;
+                       indexy = inicialy;
+                       yd = yd2;
+                       xd = xd2;
                        this_thread::sleep_for(std::chrono::seconds(2));
+                       intentos--;
                    }
                    cont = 0;
                }
